@@ -49,7 +49,8 @@
                 background: white;
             }
             .no-print { display: none !important; }
-            @page { margin: 0; size: A4; }
+            @page { margin: 1cm; size: A4; }
+            .break-inside-avoid { break-inside: avoid; }
         }
         .fade-in { animation: fadeIn 0.4s ease-in-out; }
         @keyframes fadeIn {
@@ -72,7 +73,7 @@
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useEffect, useMemo } = React;
+        const { useState, useEffect, useMemo, useRef } = React;
 
         // --- ICONOS ---
         const Icon = ({ name, className }) => {
@@ -87,7 +88,8 @@
                 droplet: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12 22a7 7 0 0 0 7-7c0-2-5-9-5-9S9 13 9 15a7 7 0 0 0 3 7z"/></svg>,
                 user: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>,
                 shield: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>,
-                calendar: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                calendar: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>,
+                book: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
             };
             return icons[name] || null;
         };
@@ -102,7 +104,7 @@
             fungible: 5.00 // Agujas, vías, desinfección
         };
 
-        // --- DATABASE DE PROTOCOLOS (7.0) ---
+        // --- DATABASE DE PROTOCOLOS (8.0 Educational) ---
         const PROTOCOLS_DB = [
             {
                 id: 'equilibrio-vital',
@@ -110,6 +112,12 @@
                 subtext: 'Menopausia / Perimenopausia',
                 target: ['sofocos', 'insomnio', 'ansiedad', 'fatiga', 'menopausia'],
                 frequency: '7-10 días',
+                clinicalJustification: [
+                    { component: "Triptófano", reason: "Precursor de Serotonina y Melatonina. Regula el estado de ánimo y reduce los sofocos nocturnos." },
+                    { component: "Magnesio", reason: "Relajante muscular natural. Reduce el estrés adrenal y mejora la calidad del sueño." },
+                    { component: "Cloruro de Calcio", reason: "Soporte para la densidad ósea, crucial en la caída de estrógenos de la perimenopausia." },
+                    { component: "Complejo B", reason: "Cofactor esencial para el metabolismo energético y equilibrio hormonal." }
+                ],
                 sessions: [
                     {
                         name: 'S1: Neuroendocrina',
@@ -153,6 +161,11 @@
                 subtext: 'Endometriosis / Dolor Pélvico',
                 target: ['endometriosis', 'dolor', 'inflamación', 'pelvico'],
                 frequency: '10-14 días',
+                clinicalJustification: [
+                    { component: "Glutatión (Dosis Alta)", reason: "Potente antioxidante que reduce el estrés oxidativo peritoneal y la inflamación sistémica." },
+                    { component: "Procaína", reason: "Efecto repolarizante celular y analgésico (Terapia Neural). Regula el sistema nervioso autónomo." },
+                    { component: "Vitamina C", reason: "Reduce marcadores inflamatorios como la PCR y mejora la respuesta inmune." }
+                ],
                 sessions: [
                     {
                         name: 'S1: Antiinflamatoria Profunda',
@@ -194,6 +207,11 @@
                 subtext: 'Fertilidad',
                 target: ['fertilidad', 'embarazo', 'ovarios', 'reserva'],
                 frequency: '7-10 días',
+                clinicalJustification: [
+                    { component: "NAD+", reason: "Restaura la función mitocondrial del ovocito, crítica para la meiosis y calidad embrionaria." },
+                    { component: "L-Carnitina", reason: "Transportador de ácidos grasos esencial para la energía del espermatozoide y maduración ovocitaria." },
+                    { component: "Zinc y Selenio", reason: "Oligoelementos vitales para la síntesis de ADN y protección antioxidante de gametos." }
+                ],
                 sessions: [
                     {
                         name: 'S1: Inicio NAD+',
@@ -234,6 +252,11 @@
                 subtext: 'Control de Peso',
                 target: ['peso', 'metabolismo', 'grasa', 'adelgazar'],
                 frequency: '7 días',
+                clinicalJustification: [
+                    { component: "Inositol", reason: "Mejora la sensibilidad a la insulina y ayuda a movilizar la grasa hepática." },
+                    { component: "L-Carnitina", reason: "Facilita la beta-oxidación ('quema') de grasas en la mitocondria." },
+                    { component: "Cromo (Oligos)", reason: "Regula los picos de glucosa en sangre, reduciendo la ansiedad por el dulce." }
+                ],
                 sessions: [
                     {
                         name: 'S1: Activación',
@@ -273,6 +296,11 @@
                 subtext: 'Cabello / Uñas',
                 target: ['cabello', 'pelo', 'uñas', 'caida'],
                 frequency: '7-14 días',
+                clinicalJustification: [
+                    { component: "Biotina", reason: "Vitamina esencial para la estructura de la queratina en cabello y uñas." },
+                    { component: "Vitamina B5 (Pantenol)", reason: "Mejora la nutrición del folículo piloso y reduce la caída." },
+                    { component: "Zinc", reason: "Inhibidor natural de la 5-alfa reductasa (relacionada con alopecia androgenética)." }
+                ],
                 sessions: [
                     {
                         name: 'S1: Nutrición',
@@ -312,6 +340,11 @@
                 subtext: 'Glow / Antiaging',
                 target: ['piel', 'arrugas', 'glow', 'manchas'],
                 frequency: '10-14 días',
+                clinicalJustification: [
+                    { component: "Glutatión", reason: "Inhibe la tirosinasa, ayudando a aclarar manchas y unificar el tono (Efecto 'Glow')." },
+                    { component: "Vitamina C", reason: "Cofactor obligatorio para la hidroxilación y síntesis de nuevo colágeno." },
+                    { component: "Complejo B", reason: "Mejora la oxigenación y nutrición de la dermis." }
+                ],
                 sessions: [
                     {
                         name: 'S1: Glow Potente',
@@ -350,6 +383,11 @@
                 subtext: 'Deporte / Recuperación',
                 target: ['deporte', 'musculo', 'fatiga', 'lesion'],
                 frequency: '7 días',
+                clinicalJustification: [
+                    { component: "L-Arginina", reason: "Precursor de Óxido Nítrico, mejora la vasodilatación y el flujo sanguíneo muscular." },
+                    { component: "Taurina", reason: "Osmorregulador que previene calambres y mejora la contractilidad cardíaca." },
+                    { component: "L-Carnitina", reason: "Ahorra glucógeno muscular al favorecer el uso de grasas como energía." }
+                ],
                 sessions: [
                     {
                         name: 'S1: Rendimiento',
@@ -389,6 +427,10 @@
                 subtext: 'Myers Clásico',
                 target: ['reset', 'estres', 'cansancio'],
                 frequency: '14 días',
+                clinicalJustification: [
+                    { component: "Complejo B", reason: "Base del metabolismo energético mitocondrial (Ciclo de Krebs)." },
+                    { component: "Magnesio", reason: "Cofactor en más de 300 reacciones enzimáticas, vital para la producción de ATP." }
+                ],
                 sessions: [
                     {
                         name: 'S1: Myers Completo',
@@ -426,6 +468,11 @@
                 subtext: 'SIBO / Disbiosis',
                 target: ['sibo', 'barriga', 'gases', 'diarrea'],
                 frequency: '10-14 días',
+                clinicalJustification: [
+                    { component: "Zinc", reason: "Esencial para el cierre de las 'Tight Junctions' (Uniones estrechas) del epitelio intestinal." },
+                    { component: "Vitamina C", reason: "Acción antiinflamatoria sobre la mucosa digestiva." },
+                    { component: "Taurina", reason: "Ayuda a la conjugación de ácidos biliares, mejorando la digestión de grasas." }
+                ],
                 sessions: [
                     {
                         name: 'S1: Mucosa + Detox',
@@ -433,7 +480,7 @@
                         duration: '60-75 min', speed: 'Lenta',
                         ingredients: [
                             { name: "Vitamina C", qty: 10, price: PRICES.vitC },
-                            { name: "Oligoelementos (Zn)", qty: 5, price: PRICES.oligo },
+                            { name: "Oligoelementos (Zinc)", qty: 5, price: PRICES.oligo },
                             { name: "Glutatión", qty: 5, price: PRICES.gluta }
                         ]
                     },
@@ -465,6 +512,10 @@
                 subtext: 'Ansiedad / Insomnio',
                 target: ['ansiedad', 'insomnio', 'nervios'],
                 frequency: '7-10 días',
+                clinicalJustification: [
+                    { component: "Taurina y Magnesio", reason: "Actúan como agonistas GABAérgicos, reduciendo la excitabilidad neuronal." },
+                    { component: "Inositol", reason: "Mejora la señalización de los receptores de serotonina." }
+                ],
                 sessions: [
                     {
                         name: 'S1: Descarga SNC',
@@ -516,6 +567,10 @@
             const [activeSession, setActiveSession] = useState(0);
             const [showReport, setShowReport] = useState(false);
             const [isListening, setIsListening] = useState(false);
+            const [viewMode, setViewMode] = useState('formula'); // 'formula' | 'clinical'
+            
+            // Referencia para el textarea
+            const textareaRef = useRef(null);
 
             // --- Lógica del Árbol de Decisión (Safety) ---
             const getSafeSession = (session) => {
@@ -538,7 +593,6 @@
                 if (flags.bipolar || flags.glaucoma) {
                     const hasNad = safeIngredients.find(i => i.id === 'nad');
                     if (hasNad) {
-                        // En NAD+ el bloqueo suele ser total o alerta grave
                          if (flags.bipolar) {
                             safeIngredients = safeIngredients.filter(i => i.id !== 'nad');
                             warnings.push("NAD+ RETIRADO (Contraindicado en Bipolaridad).");
@@ -581,16 +635,27 @@
             const currentSession = safeProtocol ? safeProtocol.sessions[activeSession] : null;
 
             // --- Cálculos ---
-            const calculateCost = (session) => {
+            const calculateSessionCost = (session) => {
                 if (!session) return 0;
                 const ingredientsCost = session.ingredients.reduce((acc, curr) => acc + (curr.price * curr.qty), 0);
                 const baseCost = session.base.price;
-                return (ingredientsCost + baseCost + PRICES.fungible).toFixed(2);
+                return (ingredientsCost + baseCost + PRICES.fungible);
+            };
+
+            const calculateTotalTreatmentCost = (protocol) => {
+                if (!protocol) return 0;
+                return protocol.sessions.reduce((acc, s) => acc + calculateSessionCost(s), 0).toFixed(2);
             };
 
             // --- Handlers ---
             const handleVoiceInput = () => {
                 if (!('webkitSpeechRecognition' in window)) { alert("Navegador no compatible."); return; }
+                
+                // Focus inmediato al textarea
+                if (textareaRef.current) {
+                    textareaRef.current.focus();
+                }
+
                 const recognition = new window.webkitSpeechRecognition();
                 recognition.lang = 'es-ES';
                 recognition.onstart = () => setIsListening(true);
@@ -611,7 +676,7 @@
                 else alert("No se encontró coincidencia clara. Seleccione manual.");
             };
 
-            // --- VISTA IMPRESIÓN ---
+            // --- VISTA IMPRESIÓN (ACTUALIZADA: CICLO COMPLETO) ---
             if (showReport && safeProtocol) {
                 return (
                     <div className="min-h-screen bg-slate-200 p-8 flex justify-center overflow-auto">
@@ -661,87 +726,68 @@
                                 </div>
                             </div>
 
-                            {/* Detalle Sesión */}
-                            <div className="mb-8">
-                                <div className="flex justify-between items-end mb-4">
-                                    <div>
-                                        <h2 className="text-2xl font-bold text-medical-800">{safeProtocol.name}</h2>
-                                        <p className="text-slate-500 font-medium">{currentSession.name}</p>
-                                    </div>
-                                    <div className="text-right">
-                                        <span className="bg-medical-100 text-medical-800 px-3 py-1 rounded text-xs font-bold border border-medical-200">
-                                            SESIÓN {activeSession + 1} DE 3
-                                        </span>
-                                    </div>
-                                </div>
+                            <h2 className="text-2xl font-bold text-medical-800 mb-2">{safeProtocol.name}</h2>
+                            <p className="text-slate-500 font-medium mb-6">{safeProtocol.subtext} - Ciclo Completo de {safeProtocol.sessions.length} Sesiones</p>
 
-                                {/* Advertencias Dinámicas */}
-                                {currentSession.warnings.length > 0 && (
-                                    <div className="mb-4 p-3 bg-amber-50 border-l-4 border-amber-500 text-amber-800 text-xs">
-                                        <p className="font-bold flex items-center gap-2"><Icon name="alert" className="h-4 w-4"/> MODIFICACIONES DE SEGURIDAD:</p>
-                                        <ul className="list-disc pl-5 mt-1">
-                                            {currentSession.warnings.map((w,i) => <li key={i}>{w}</li>)}
-                                        </ul>
+                            {/* ITERACIÓN DE SESIONES (CICLO COMPLETO) */}
+                            {safeProtocol.sessions.map((session, index) => (
+                                <div key={index} className="break-inside-avoid mb-8 border border-slate-200 rounded-lg overflow-hidden">
+                                    <div className="bg-slate-50 p-3 border-b border-slate-200 flex justify-between items-center">
+                                        <h3 className="font-bold text-medical-700">SESIÓN {index + 1}: {session.name}</h3>
+                                        <div className="text-xs text-slate-500 flex gap-4">
+                                            <span>Duración: <b>{session.duration}</b></span>
+                                            <span>Velocidad: <b>{session.speed}</b></span>
+                                        </div>
                                     </div>
-                                )}
+                                    
+                                    {session.warnings.length > 0 && (
+                                        <div className="bg-amber-50 p-2 text-xs text-amber-800 border-b border-amber-100">
+                                            <strong>⚠ Modificado:</strong> {session.warnings.join(' ')}
+                                        </div>
+                                    )}
 
-                                {/* Tabla Composición */}
-                                <table className="w-full text-sm border-collapse mb-6">
-                                    <thead>
-                                        <tr className="bg-slate-100 text-slate-600 border-b border-slate-200">
-                                            <th className="p-3 text-left">Componente</th>
-                                            <th className="p-3 text-right">Dosis</th>
-                                            <th className="p-3 text-center w-24">Verificación</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-slate-100">
-                                        <tr className="bg-medical-50 font-semibold text-medical-900">
-                                            <td className="p-3">{currentSession.base.name}</td>
-                                            <td className="p-3 text-right font-mono">{currentSession.base.qty} ml</td>
-                                            <td className="p-3 text-center"><div className="w-4 h-4 border border-medical-300 bg-white mx-auto rounded-sm"></div></td>
-                                        </tr>
-                                        {currentSession.ingredients.map((ing, i) => (
-                                            <tr key={i}>
-                                                <td className="p-3 text-slate-700">{ing.name}</td>
-                                                <td className="p-3 text-right font-mono font-bold">{ing.qty} ml</td>
-                                                <td className="p-3 text-center"><div className="w-4 h-4 border border-slate-300 mx-auto rounded-sm"></div></td>
+                                    <table className="w-full text-xs">
+                                        <thead>
+                                            <tr className="bg-white text-slate-400 border-b border-slate-100">
+                                                <th className="px-4 py-2 text-left w-1/2">Componente</th>
+                                                <th className="px-4 py-2 text-right">Dosis</th>
+                                                <th className="px-4 py-2 text-right">Coste Int.</th>
                                             </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-
-                                {/* Parámetros Infusión */}
-                                <div className="grid grid-cols-3 gap-4 text-xs font-medium text-slate-600 bg-slate-50 p-4 rounded border border-slate-200">
-                                    <div>
-                                        <span className="block text-slate-400 uppercase text-[10px]">Duración</span>
-                                        <span className="text-lg text-slate-800">{currentSession.duration}</span>
-                                    </div>
-                                    <div>
-                                        <span className="block text-slate-400 uppercase text-[10px]">Velocidad</span>
-                                        <span className="text-lg text-slate-800">{currentSession.speed}</span>
-                                    </div>
-                                    <div>
-                                        <span className="block text-slate-400 uppercase text-[10px]">Vía</span>
-                                        <span className="text-lg text-slate-800">Periférica</span>
-                                    </div>
+                                        </thead>
+                                        <tbody className="divide-y divide-slate-50">
+                                            <tr className="bg-slate-50/50">
+                                                <td className="px-4 py-2 font-medium">{session.base.name}</td>
+                                                <td className="px-4 py-2 text-right">{session.base.qty} ml</td>
+                                                <td className="px-4 py-2 text-right text-slate-400">{session.base.price.toFixed(2)}€</td>
+                                            </tr>
+                                            {session.ingredients.map((ing, i) => (
+                                                <tr key={i}>
+                                                    <td className="px-4 py-2">{ing.name}</td>
+                                                    <td className="px-4 py-2 text-right font-bold">{ing.qty} ml</td>
+                                                    <td className="px-4 py-2 text-right text-slate-400">{(ing.price * ing.qty).toFixed(2)}€</td>
+                                                </tr>
+                                            ))}
+                                            <tr className="bg-slate-100 font-bold text-slate-700">
+                                                <td className="px-4 py-2" colSpan="2">Coste Sesión (Mat+Fun)</td>
+                                                <td className="px-4 py-2 text-right">{calculateSessionCost(session).toFixed(2)} €</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
                                 </div>
-                            </div>
+                            ))}
 
-                            {/* Costes Internos (Solo visible para clínica) */}
-                            <div className="mt-8 pt-4 border-t-2 border-dashed border-slate-200 flex justify-between items-center text-xs text-slate-400">
-                                <div>
-                                    <p>Coste Fungible Incluido: {PRICES.fungible}€</p>
-                                    <p>Usuario: Dra. Macias</p>
-                                </div>
+                            {/* TOTALES */}
+                            <div className="mt-8 pt-6 border-t-2 border-slate-800 flex justify-end">
                                 <div className="text-right">
-                                    <p className="uppercase font-bold">Coste Total Sesión (Material)</p>
-                                    <p className="text-xl font-mono text-slate-700 font-bold">{calculateCost(currentSession)} €</p>
+                                    <p className="text-sm text-slate-500 uppercase font-bold mb-1">Coste Total Ciclo Completo</p>
+                                    <p className="text-3xl font-mono text-slate-800 font-bold">{calculateTotalTreatmentCost(safeProtocol)} €</p>
+                                    <p className="text-xs text-slate-400 mt-1">*Incluye material y fungible</p>
                                 </div>
                             </div>
                             
                             {/* Footer */}
                             <div className="absolute bottom-12 left-12 right-12 text-center border-t border-slate-200 pt-4">
-                                <p className="text-xs text-slate-400">Documento generado por Software Gestor Clínica 4 Elements v7.0</p>
+                                <p className="text-xs text-slate-400">Documento clínico generado por Software Gestor Clínica 4 Elements v8.0</p>
                             </div>
                         </div>
                     </div>
@@ -758,7 +804,7 @@
                                 <Icon name="droplet" className="h-6 w-6 text-sky-400"/>
                                 <div>
                                     <h1 className="font-bold text-lg leading-none tracking-tight">CLÍNICA 4 ELEMENTS</h1>
-                                    <p className="text-xs text-sky-200/80 font-medium">SISTEMA INTELIGENTE IV v7.0</p>
+                                    <p className="text-xs text-sky-200/80 font-medium">SISTEMA INTELIGENTE IV v8.0</p>
                                 </div>
                             </div>
                             <div className="text-xs bg-white/10 px-3 py-1 rounded-full">
@@ -818,7 +864,13 @@
                             {/* Buscador */}
                             <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
                                 <div className="relative">
-                                    <textarea placeholder="Síntomas (Ej: sofocos, insomnio...)" className="w-full p-3 pr-10 bg-slate-50 border border-slate-200 rounded h-20 text-sm focus:ring-2 focus:ring-medical-500 outline-none resize-none" value={patient.symptoms} onChange={e=>setPatient({...patient, symptoms:e.target.value})}></textarea>
+                                    <textarea 
+                                        ref={textareaRef}
+                                        placeholder="Síntomas (Ej: sofocos, insomnio...)" 
+                                        className="w-full p-3 pr-10 bg-slate-50 border border-slate-200 rounded h-20 text-sm focus:ring-2 focus:ring-medical-500 outline-none resize-none" 
+                                        value={patient.symptoms} 
+                                        onChange={e=>setPatient({...patient, symptoms:e.target.value})}
+                                    ></textarea>
                                     <button onClick={handleVoiceInput} className={`absolute right-2 bottom-2 p-1.5 rounded-full transition ${isListening ? 'bg-red-500 text-white animate-pulse' : 'bg-slate-200 text-slate-500 hover:text-medical-600'}`}>
                                         <Icon name="mic" className="h-4 w-4"/>
                                     </button>
@@ -853,80 +905,134 @@
                                         </div>
                                     </div>
 
-                                    {/* Navegación Sesiones */}
+                                    {/* Navegación Pestañas Superior */}
                                     <div className="flex border-b border-slate-200 bg-white">
-                                        {safeProtocol.sessions.map((s, idx) => (
-                                            <button key={idx} 
-                                                onClick={() => setActiveSession(idx)}
-                                                className={`flex-1 py-4 text-sm font-bold border-b-2 transition-colors duration-200 ${activeSession === idx ? 'border-medical-500 text-medical-700 bg-medical-50/50' : 'border-transparent text-slate-400 hover:text-slate-600 hover:bg-slate-50'}`}
-                                            >
-                                                SESIÓN {idx + 1}
-                                            </button>
-                                        ))}
+                                        <button 
+                                            onClick={() => setViewMode('formula')}
+                                            className={`flex-1 py-3 text-sm font-bold border-b-2 transition-colors duration-200 ${viewMode === 'formula' ? 'border-medical-500 text-medical-700 bg-medical-50/20' : 'border-transparent text-slate-400'}`}
+                                        >
+                                            <span className="flex items-center justify-center gap-2"><Icon name="droplet" className="h-4 w-4"/> Fórmula & Sesiones</span>
+                                        </button>
+                                        <button 
+                                            onClick={() => setViewMode('clinical')}
+                                            className={`flex-1 py-3 text-sm font-bold border-b-2 transition-colors duration-200 ${viewMode === 'clinical' ? 'border-amber-500 text-amber-700 bg-amber-50/20' : 'border-transparent text-slate-400'}`}
+                                        >
+                                            <span className="flex items-center justify-center gap-2"><Icon name="book" className="h-4 w-4"/> ¿Por qué esta fórmula? (Docencia)</span>
+                                        </button>
                                     </div>
 
-                                    {/* Detalle Sesión Activa */}
+                                    {/* CONTENIDO PRINCIPAL */}
                                     <div className="p-8 flex-grow">
-                                        <div className="flex justify-between items-center mb-6">
-                                            <h3 className="text-xl font-bold text-medical-800">{currentSession.name}</h3>
-                                            <div className="flex gap-4 text-sm font-medium text-slate-600">
-                                                <span className="flex items-center gap-1 bg-slate-100 px-3 py-1 rounded-full"><Icon name="clock" className="h-4 w-4"/> {currentSession.duration}</span>
-                                                <span className={`flex items-center gap-1 px-3 py-1 rounded-full ${currentSession.speed.includes('Muy') ? 'bg-amber-100 text-amber-700' : 'bg-slate-100'}`}>Velocidad: {currentSession.speed}</span>
-                                            </div>
-                                        </div>
+                                        
+                                        {viewMode === 'formula' ? (
+                                            <>
+                                                {/* Selector de Sesiones (Solo visible en modo Fórmula) */}
+                                                <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
+                                                    {safeProtocol.sessions.map((s, idx) => (
+                                                        <button key={idx} 
+                                                            onClick={() => setActiveSession(idx)}
+                                                            className={`whitespace-nowrap px-4 py-2 rounded-lg text-xs font-bold transition-all ${activeSession === idx ? 'bg-medical-600 text-white shadow-md' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}
+                                                        >
+                                                            SESIÓN {idx + 1}
+                                                        </button>
+                                                    ))}
+                                                </div>
 
-                                        {/* ALERTAS MODIFICACION */}
-                                        {currentSession.modified && (
-                                            <div className="bg-amber-50 border-l-4 border-amber-500 p-4 mb-6 rounded-r">
-                                                <div className="flex items-start">
-                                                    <div className="flex-shrink-0">
-                                                        <Icon name="alert" className="h-5 w-5 text-amber-500"/>
+                                                <div className="flex justify-between items-center mb-6">
+                                                    <h3 className="text-xl font-bold text-medical-800">{currentSession.name}</h3>
+                                                    <div className="flex gap-4 text-sm font-medium text-slate-600">
+                                                        <span className="flex items-center gap-1 bg-slate-100 px-3 py-1 rounded-full"><Icon name="clock" className="h-4 w-4"/> {currentSession.duration}</span>
+                                                        <span className={`flex items-center gap-1 px-3 py-1 rounded-full ${currentSession.speed.includes('Muy') ? 'bg-amber-100 text-amber-700' : 'bg-slate-100'}`}>Velocidad: {currentSession.speed}</span>
                                                     </div>
-                                                    <div className="ml-3">
-                                                        <h3 className="text-sm font-bold text-amber-800">Protocolo Modificado por Seguridad</h3>
-                                                        <div className="mt-1 text-sm text-amber-700">
-                                                            <ul className="list-disc list-inside">
-                                                                {currentSession.warnings.map((w,i) => <li key={i}>{w}</li>)}
-                                                            </ul>
+                                                </div>
+
+                                                {/* ALERTAS MODIFICACION */}
+                                                {currentSession.modified && (
+                                                    <div className="bg-amber-50 border-l-4 border-amber-500 p-4 mb-6 rounded-r">
+                                                        <div className="flex items-start">
+                                                            <div className="flex-shrink-0">
+                                                                <Icon name="alert" className="h-5 w-5 text-amber-500"/>
+                                                            </div>
+                                                            <div className="ml-3">
+                                                                <h3 className="text-sm font-bold text-amber-800">Protocolo Modificado por Seguridad</h3>
+                                                                <div className="mt-1 text-sm text-amber-700">
+                                                                    <ul className="list-disc list-inside">
+                                                                        {currentSession.warnings.map((w,i) => <li key={i}>{w}</li>)}
+                                                                    </ul>
+                                                                </div>
+                                                            </div>
                                                         </div>
+                                                    </div>
+                                                )}
+
+                                                {/* TABLA INGREDIENTES */}
+                                                <div className="bg-white border border-slate-200 rounded-lg overflow-hidden mb-6">
+                                                    <table className="w-full text-sm">
+                                                        <thead className="bg-slate-50 text-slate-500 font-medium border-b border-slate-200">
+                                                            <tr>
+                                                                <th className="px-6 py-3 text-left">Componente</th>
+                                                                <th className="px-6 py-3 text-right">Cantidad</th>
+                                                                <th className="px-6 py-3 text-right">Coste</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody className="divide-y divide-slate-100">
+                                                            {/* Base */}
+                                                            <tr className="bg-medical-50/30">
+                                                                <td className="px-6 py-3 font-semibold text-slate-700">{currentSession.base.name}</td>
+                                                                <td className="px-6 py-3 text-right font-mono">{currentSession.base.qty} ml</td>
+                                                                <td className="px-6 py-3 text-right text-slate-400 font-mono">{(currentSession.base.price).toFixed(2)}€</td>
+                                                            </tr>
+                                                            {/* Ingredientes */}
+                                                            {currentSession.ingredients.map((ing, i) => (
+                                                                <tr key={i}>
+                                                                    <td className="px-6 py-3 text-slate-600">{ing.name}</td>
+                                                                    <td className="px-6 py-3 text-right font-mono font-bold text-medical-700">{ing.qty} ml</td>
+                                                                    <td className="px-6 py-3 text-right text-slate-400 font-mono">{(ing.price * ing.qty).toFixed(2)}€</td>
+                                                                </tr>
+                                                            ))}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </>
+                                        ) : (
+                                            /* VISTA DOCENCIA / CLÍNICA */
+                                            <div className="fade-in">
+                                                <div className="bg-amber-50 p-6 rounded-xl border border-amber-100 mb-6">
+                                                    <h3 className="text-lg font-bold text-amber-800 mb-4 flex items-center gap-2">
+                                                        <Icon name="book" className="h-5 w-5"/> Justificación Clínica
+                                                    </h3>
+                                                    <div className="space-y-4">
+                                                        {safeProtocol.clinicalJustification && safeProtocol.clinicalJustification.map((item, idx) => (
+                                                            <div key={idx} className="flex gap-4 items-start">
+                                                                <div className="bg-white p-2 rounded-lg shadow-sm font-bold text-amber-700 text-sm whitespace-nowrap min-w-[120px] text-center">
+                                                                    {item.component}
+                                                                </div>
+                                                                <p className="text-slate-700 text-sm leading-relaxed pt-1">
+                                                                    {item.reason}
+                                                                </p>
+                                                            </div>
+                                                        ))}
+                                                        {(!safeProtocol.clinicalJustification) && <p className="text-slate-500 italic">No hay información clínica disponible para este protocolo.</p>}
+                                                    </div>
+                                                </div>
+                                                <div className="bg-blue-50 p-6 rounded-xl border border-blue-100">
+                                                    <h3 className="text-sm font-bold text-blue-800 uppercase mb-2">Objetivos Terapéuticos</h3>
+                                                    <div className="flex flex-wrap gap-2">
+                                                        {safeProtocol.target.map((t, i) => (
+                                                            <span key={i} className="bg-white text-blue-600 px-3 py-1 rounded-full text-xs font-bold shadow-sm border border-blue-100 capitalize">{t}</span>
+                                                        ))}
                                                     </div>
                                                 </div>
                                             </div>
                                         )}
 
-                                        {/* TABLA INGREDIENTES */}
-                                        <div className="bg-white border border-slate-200 rounded-lg overflow-hidden mb-6">
-                                            <table className="w-full text-sm">
-                                                <thead className="bg-slate-50 text-slate-500 font-medium border-b border-slate-200">
-                                                    <tr>
-                                                        <th className="px-6 py-3 text-left">Componente</th>
-                                                        <th className="px-6 py-3 text-right">Cantidad</th>
-                                                        <th className="px-6 py-3 text-right">Coste</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody className="divide-y divide-slate-100">
-                                                    {/* Base */}
-                                                    <tr className="bg-medical-50/30">
-                                                        <td className="px-6 py-3 font-semibold text-slate-700">{currentSession.base.name}</td>
-                                                        <td className="px-6 py-3 text-right font-mono">{currentSession.base.qty} ml</td>
-                                                        <td className="px-6 py-3 text-right text-slate-400 font-mono">{(currentSession.base.price).toFixed(2)}€</td>
-                                                    </tr>
-                                                    {/* Ingredientes */}
-                                                    {currentSession.ingredients.map((ing, i) => (
-                                                        <tr key={i}>
-                                                            <td className="px-6 py-3 text-slate-600">{ing.name}</td>
-                                                            <td className="px-6 py-3 text-right font-mono font-bold text-medical-700">{ing.qty} ml</td>
-                                                            <td className="px-6 py-3 text-right text-slate-400 font-mono">{(ing.price * ing.qty).toFixed(2)}€</td>
-                                                        </tr>
-                                                    ))}
-                                                </tbody>
-                                            </table>
-                                        </div>
-
                                         {/* FOOTER SESIÓN */}
                                         <div className="flex justify-between items-center mt-auto pt-4 border-t border-slate-100">
                                             <div className="bg-slate-100 text-slate-500 px-4 py-2 rounded-lg text-xs font-mono">
-                                                Coste Total (Mat+Fun): <strong>{calculateCost(currentSession)} €</strong>
+                                                {viewMode === 'formula' ? 
+                                                    `Coste Sesión Activa: ${calculateSessionCost(currentSession).toFixed(2)} €` : 
+                                                    `Coste Ciclo Completo: ${calculateTotalTreatmentCost(safeProtocol)} €`
+                                                }
                                             </div>
                                             <button onClick={() => setShowReport(true)} className="bg-medical-600 hover:bg-medical-700 text-white px-8 py-3 rounded-lg font-bold shadow-md transform transition hover:-translate-y-0.5 flex items-center gap-2">
                                                 <Icon name="printer" className="h-5 w-5"/> GENERAR ORDEN PDF
@@ -937,7 +1043,7 @@
                             ) : (
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     {PROTOCOLS_DB.map(p => (
-                                        <button key={p.id} onClick={() => { setSelectedProtocol(p); setActiveSession(0); window.scrollTo({top:0, behavior:'smooth'}); }} 
+                                        <button key={p.id} onClick={() => { setSelectedProtocol(p); setActiveSession(0); setViewMode('formula'); window.scrollTo({top:0, behavior:'smooth'}); }} 
                                             className="bg-white p-6 rounded-xl border border-slate-200 hover:border-medical-400 hover:shadow-lg transition-all duration-300 text-left group flex flex-col h-full">
                                             <div className="flex items-start justify-between mb-2">
                                                 <span className="text-lg font-bold text-slate-700 group-hover:text-medical-600 transition-colors">{p.name}</span>
