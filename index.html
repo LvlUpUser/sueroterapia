@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestor Clínica Dra. Macias - Sueroterapia</title>
+    
+    <!-- Librerías Externas (React, ReactDOM, Babel, Tailwind) -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Estilos para Impresión (PDF) -->
+    <style>
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #print-section, #print-section * {
+                visibility: visible;
+            }
+            #print-section {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                background: white;
+                padding: 0;
+                margin: 0;
+            }
+            .no-print {
+                display: none !important;
+            }
+            body {
+                background: white;
+                color: black;
+            }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // --- ICONOS SVG ---
+        const Icon = ({ name, className }) => {
+            const icons = {
+                activity: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>,
+                package: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22v-9"/></svg>,
+                checkCircle: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>,
+                alertCircle: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>,
+                droplet: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12 22a7 7 0 0 0 7-7c0-2-5-9-5-9S9 13 9 15a7 7 0 0 0 3 7z"/></svg>,
+                clipboard: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg>,
+                search: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>,
+                user: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>,
+                x: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>,
+                fileText: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><line x1="10" x2="8" y1="9" y2="9"/></svg>,
+                printer: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>,
+                calendar: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>,
+                trash: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>,
+                bookOpen: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+            };
+            return icons[name] || null;
+        };
+
+        // --- PROTOCOLOS (Con Indicaciones Clínicas) ---
+        const PROTOCOLS = [
+            {
+                id: 'anti-estres',
+                name: 'Anti-Estrés y Regulación Nerviosa',
+                target: ['ansiedad', 'insomnio', 'estrés', 'nerviosismo', 'fatiga mental', 'dormir', 'descanso', 'calma'],
+                description: 'Equilibra el sistema nervioso, reduce la ansiedad y mejora el sueño.',
+                duration: '45 min',
+                clinicalNote: 'Combinación sinérgica para modulación GABAérgica y soporte adrenal. El Complejo B es esencial para la síntesis de neurotransmisores, mientras que el Magnesio reduce la excitabilidad neuronal. La Taurina actúa como neuroprotector osmorregulador y el Inositol mejora la sensibilidad de los receptores de serotonina.',
+                ingredients: [
+                    { name: 'Vitamina C 500mg/ml', qty: 15, unit: 'ml' },
+                    { name: 'Complejo B', qty: 1, unit: 'vial' },
+                    { name: 'Magnesio', qty: 1, unit: 'ampolla' },
+                    { name: 'Taurina', qty: 1, unit: 'vial' },
+                    { name: 'Inositol', qty: 1, unit: 'vial' },
+                    { name: 'Ácido Fólico', qty: 1, unit: 'ampolla' },
+                    { name: 'Suero Fisiológico 500ml', qty: 1, unit: 'bolsa' }
+                ]
+            },
+            {
+                id: 'energia',
+                name: 'Energizante y Rendimiento Físico',
+                target: ['fatiga crónica', 'cansancio', 'bajo rendimiento', 'deportista', 'agotamiento', 'debilidad', 'energia', 'vitalidad'],
+                description: 'Aumenta la vitalidad, energía celular y rendimiento físico.',
+                duration: '90 min',
+                clinicalNote: 'Protocolo enfocado en la biogénesis mitocondrial. El NAD+ es coenzima crítica en la fosforilación oxidativa (producción de ATP). La Acetil-L-Carnitina facilita el transporte de ácidos grasos a la mitocondria para su beta-oxidación. La Arginina mejora la perfusión tisular mediante la vía del óxido nítrico.',
+                ingredients: [
+                    { name: 'NAD+', qty: 1, unit: 'vial' },
+                    { name: 'Complejo B', qty: 1, unit: 'vial' },
+                    { name: 'Magnesio', qty: 1, unit: 'ampolla' },
+                    { name: 'Acetil-L-Carnitina', qty: 1, unit: 'vial' },
+                    { name: 'Arginina', qty: 1, unit: 'vial' },
+                    { name: 'Suero Fisiológico 500ml', qty: 1, unit: 'bolsa' }
+                ]
+            },
+            {
+                id: 'inmunidad',
+                name: 'Inmunidad y Defensa',
+                target: ['resfriados', 'defensas', 'virus', 'prevención', 'gripe', 'catarro', 'inmune', 'frio'],
+                description: 'Refuerza el sistema inmunológico, previene infecciones y reduce inflamación.',
+                duration: '60 min',
+                clinicalNote: 'Refuerzo de la barrera epitelial y función leucocitaria. Dosis altas de Vitamina C promueven la quimiotaxis y fagocitosis. El Zinc es crucial para el desarrollo y función de neutrófilos y células NK. El Selenio actúa en selenoenzimas antioxidantes reduciendo el estrés oxidativo asociado a infecciones.',
+                ingredients: [
+                    { name: 'Vitamina C 500mg/ml', qty: 20, unit: 'ml' },
+                    { name: 'Oligoelementos (Zinc/Selenio)', qty: 1, unit: 'vial' },
+                    { name: 'Complejo B', qty: 1, unit: 'vial' },
+                    { name: 'Vitamina D', qty: 1, unit: 'vial' },
+                    { name: 'Suero Fisiológico 500ml', qty: 1, unit: 'bolsa' }
+                ]
+            },
+            {
+                id: 'antiedad',
+                name: 'Antiedad y Rejuvenecimiento (Glow)',
+                target: ['piel', 'arrugas', 'envejecimiento', 'manchas', 'belleza', 'rejuvenecimiento', 'cara', 'luminosidad'],
+                description: 'Mejora el estado de la piel, cabello y energía mitocondrial.',
+                duration: '60 min',
+                clinicalNote: 'Enfoque antioxidante sistémico y dérmico. El Glutatión (Maestro Antioxidante) neutraliza radicales libres y aclara hiperpigmentaciones (inhibición tirosinasa). La Vitamina C es cofactor indispensable para la hidroxilación de prolina y lisina en la síntesis de colágeno nuevo.',
+                ingredients: [
+                    { name: 'Glutatión Reducido', qty: 1, unit: 'vial' },
+                    { name: 'Vitamina C 500mg/ml', qty: 15, unit: 'ml' },
+                    { name: 'Oligoelementos (Zinc/Selenio)', qty: 1, unit: 'vial' },
+                    { name: 'Suero Fisiológico 500ml', qty: 1, unit: 'bolsa' }
+                ]
+            },
+            {
+                id: 'detox',
+                name: 'Detoxificación Hepática',
+                target: ['toxinas', 'resaca', 'mala alimentación', 'hígado', 'alcohol', 'fiesta', 'detox', 'limpieza'],
+                description: 'Apoya al hígado y riñón para eliminar toxinas.',
+                duration: '60 min',
+                clinicalNote: 'Soporte a las fases I y II de detoxificación hepática. El Glutatión conjuga toxinas liposolubles para su excreción. El Complejo B proporciona cofactores enzimáticos esenciales. La hidratación intensiva favorece la eliminación renal de metabolitos tóxicos.',
+                ingredients: [
+                    { name: 'Glutatión Reducido', qty: 1, unit: 'vial' },
+                    { name: 'Complejo B', qty: 1, unit: 'vial' },
+                    { name: 'Vitamina C 500mg/ml', qty: 10, unit: 'ml' },
+                    { name: 'Suero Fisiológico 500ml', qty: 1, unit: 'bolsa' }
+                ]
+            }
+        ];
+
+        // --- COMPONENTE PRINCIPAL ---
+        function SueroterapiaApp() {
+            // Estado Paciente
+            const [patient, setPatient] = useState({ 
+                name: '', 
+                age: '', 
+                sex: '', 
+                symptoms: '' 
+            });
+            
+            const [suggestion, setSuggestion] = useState(null);
+            const [notification, setNotification] = useState(null);
+            
+            // Estado para reporte
+            const [showReport, setShowReport] = useState(false);
+            const [reportData, setReportData] = useState(null);
+            
+            // Estado para mostrar indicaciones clínicas en pantalla
+            const [showClinicalInfo, setShowClinicalInfo] = useState(false);
+
+            const showNotification = (message, type = 'success') => {
+                setNotification({ message, type });
+                setTimeout(() => setNotification(null), 4000);
+            };
+
+            const resetForm = () => {
+                setPatient({ name: '', age: '', sex: '', symptoms: '' });
+                setSuggestion(null);
+                setShowClinicalInfo(false);
+                showNotification("Formulario limpiado. Listo para nuevo paciente.", "success");
+            };
+
+            const analyzePatient = () => {
+                if (!patient.symptoms.trim()) {
+                    showNotification("Por favor, introduce síntomas para buscar.", "error");
+                    return;
+                }
+                const text = patient.symptoms.toLowerCase();
+                
+                const scores = PROTOCOLS.map(proto => {
+                    let matches = 0;
+                    proto.target.forEach(keyword => {
+                        if (text.includes(keyword)) matches++;
+                    });
+                    return { ...proto, score: matches };
+                });
+
+                scores.sort((a, b) => b.score - a.score);
+
+                if (scores[0].score > 0) {
+                    setSuggestion(scores[0]);
+                    setShowClinicalInfo(false); // Resetear vista de info al buscar nuevo
+                } else {
+                    setSuggestion(null);
+                    showNotification("No se encontró protocolo exacto. Prueba: fatiga, estrés, piel...", "error");
+                }
+            };
+
+            const handleGenerateReport = (protocol) => {
+                // Lógica de resumen de síntomas para impresión
+                let summarySymptoms = patient.symptoms;
+                if (summarySymptoms.length > 150) {
+                    summarySymptoms = summarySymptoms.substring(0, 150) + "...";
+                }
+
+                setReportData({
+                    patientName: patient.name || 'Paciente sin nombre',
+                    age: patient.age,
+                    sex: patient.sex,
+                    symptoms: summarySymptoms, // Usamos la versión resumida
+                    fullSymptoms: patient.symptoms, // Guardamos la completa por si acaso
+                    protocol: protocol,
+                    date: new Date().toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute:'2-digit' })
+                });
+                setShowReport(true);
+            };
+
+            const confirmPrint = () => {
+                setTimeout(() => {
+                    window.print();
+                }, 100);
+            };
+
+            // --- VISTA DE REPORTE (PDF) ---
+            if (showReport && reportData) {
+                return (
+                    <div className="min-h-screen bg-slate-200 p-4 flex justify-center items-start overflow-y-auto">
+                        {/* Controles NO imprimibles */}
+                        <div className="fixed top-4 right-4 flex flex-col gap-2 no-print z-50">
+                            <div className="bg-white p-3 rounded-lg shadow-lg border border-slate-200">
+                                <div className="flex gap-2">
+                                    <button 
+                                        onClick={() => setShowReport(false)}
+                                        className="px-4 py-2 bg-slate-500 hover:bg-slate-600 text-white rounded text-sm font-medium transition"
+                                    >
+                                        Cerrar
+                                    </button>
+                                    <button 
+                                        onClick={confirmPrint}
+                                        className="px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded text-sm font-medium transition flex items-center justify-center gap-2"
+                                    >
+                                        <Icon name="printer" className="h-4 w-4" /> Imprimir / PDF
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* HOJA A4 IMPRIMIBLE */}
+                        <div id="print-section" className="bg-white w-full max-w-[21cm] min-h-[29.7cm] p-[2cm] shadow-2xl">
+                            
+                            {/* Cabecera Actualizada */}
+                            <div className="flex justify-between items-start border-b-2 border-slate-800 pb-6 mb-8">
+                                <div className="flex items-center gap-3">
+                                    <Icon name="droplet" className="h-10 w-10 text-teal-700" />
+                                    <div>
+                                        <h1 className="text-2xl font-bold text-slate-900 uppercase tracking-wide">CLINICA 4 ELEMENTS</h1>
+                                        <p className="text-sm text-slate-500">Medicina Regenerativa y Sueroterapia</p>
+                                    </div>
+                                </div>
+                                <div className="text-right text-sm text-slate-600">
+                                    <p>c. Ave Maria 29</p>
+                                    <p>17130 L'Escala</p>
+                                    <p>Girona, España</p>
+                                </div>
+                            </div>
+
+                            {/* Datos Paciente */}
+                            <div className="bg-slate-50 p-6 rounded-lg mb-8 border border-slate-100">
+                                <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 border-b border-slate-200 pb-2">Datos del Paciente</h2>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <p className="text-xs text-slate-500">Nombre Completo</p>
+                                        <p className="text-lg font-semibold text-slate-800">{reportData.patientName}</p>
+                                    </div>
+                                    <div className="text-right">
+                                        <p className="text-xs text-slate-500">Fecha de Prescripción</p>
+                                        <p className="text-lg font-semibold text-slate-800 flex items-center justify-end gap-2">
+                                            <Icon name="calendar" className="h-4 w-4" /> {reportData.date}
+                                        </p>
+                                    </div>
+                                    
+                                    {/* Campos: Edad y Sexo */}
+                                    <div>
+                                        <p className="text-xs text-slate-500">Edad</p>
+                                        <p className="text-md font-medium text-slate-800">{reportData.age ? `${reportData.age} años` : '-'}</p>
+                                    </div>
+                                    <div className="text-right">
+                                        <p className="text-xs text-slate-500">Sexo</p>
+                                        <p className="text-md font-medium text-slate-800">{reportData.sex || '-'}</p>
+                                    </div>
+
+                                    <div className="col-span-2 mt-2">
+                                        <p className="text-xs text-slate-500">Motivo de Consulta / Síntomas</p>
+                                        {/* Síntomas resumidos si eran muy largos */}
+                                        <p className="text-sm text-slate-700 italic">{reportData.symptoms}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Tabla Protocolo */}
+                            <div className="mb-8">
+                                <div className="flex justify-between items-center mb-4">
+                                    <h2 className="text-xl font-bold text-teal-800">Orden de Tratamiento Intravenoso</h2>
+                                </div>
+                                
+                                <div className="border border-slate-300 rounded-lg overflow-hidden">
+                                    <div className="bg-slate-100 px-4 py-3 border-b border-slate-300 flex justify-between items-center">
+                                        <span className="font-bold text-slate-800">{reportData.protocol.name}</span>
+                                        <span className="text-xs bg-white px-2 py-1 rounded border border-slate-300">Duración: {reportData.protocol.duration}</span>
+                                    </div>
+                                    
+                                    <table className="w-full text-sm">
+                                        <thead className="bg-slate-50 text-slate-600 text-xs uppercase border-b border-slate-200">
+                                            <tr>
+                                                <th className="px-4 py-2 text-left w-12">Check</th>
+                                                <th className="px-4 py-2 text-left">Principio Activo</th>
+                                                <th className="px-4 py-2 text-right">Dosis / Cantidad</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-slate-200">
+                                            {reportData.protocol.ingredients.map((ing, i) => (
+                                                <tr key={i}>
+                                                    <td className="px-4 py-3">
+                                                        <div className="w-4 h-4 border border-slate-400 rounded-sm"></div>
+                                                    </td>
+                                                    <td className="px-4 py-3 font-medium text-slate-700">{ing.name}</td>
+                                                    <td className="px-4 py-3 text-right font-mono">{ing.qty} {ing.unit}</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            {/* Firma */}
+                            <div className="grid grid-cols-2 gap-12 mt-12">
+                                <div>
+                                    <p className="text-xs font-bold text-slate-400 uppercase mb-2">Observaciones de Enfermería</p>
+                                    <div className="h-32 border border-slate-200 rounded-lg bg-slate-50 border-dashed"></div>
+                                </div>
+                                <div className="flex flex-col justify-end items-center text-center">
+                                    <div className="w-48 border-b border-slate-800 mb-2"></div>
+                                    <p className="font-bold text-slate-800">Fdo. Dra. Macias</p>
+                                    <p className="text-xs text-slate-500">Colegiado Nº: [Pendiente]</p>
+                                </div>
+                            </div>
+
+                            {/* Footer */}
+                            <div className="mt-16 pt-4 border-t border-slate-200 text-center text-[10px] text-slate-400">
+                                <p>Documento generado electrónicamente por Sistema de Gestión Clínica.</p>
+                                <p>Este documento contiene información confidencial destinada al personal sanitario.</p>
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+
+            // --- VISTA PRINCIPAL (DASHBOARD) ---
+            return (
+                <div className="min-h-screen bg-slate-50 font-sans text-slate-800 relative pb-10">
+                    
+                    {/* Notificaciones */}
+                    {notification && (
+                        <div className={`fixed top-4 left-1/2 transform -translate-x-1/2 z-[100] px-6 py-3 rounded-lg shadow-xl flex items-center gap-3 fade-in ${
+                            notification.type === 'error' ? 'bg-red-600 text-white' : 'bg-green-600 text-white'
+                        }`}>
+                            {notification.type === 'error' ? <Icon name="alertCircle" className="h-5 w-5" /> : <Icon name="checkCircle" className="h-5 w-5" />}
+                            <span className="font-medium">{notification.message}</span>
+                            <button onClick={() => setNotification(null)} className="ml-2 opacity-80 hover:opacity-100">
+                                <Icon name="x" className="h-4 w-4" />
+                            </button>
+                        </div>
+                    )}
+
+                    {/* Header */}
+                    <header className="bg-teal-700 text-white shadow-md sticky top-0 z-40">
+                        <div className="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
+                            <div className="flex items-center gap-2">
+                                <Icon name="droplet" className="h-6 w-6 text-teal-200" />
+                                <div>
+                                    <h1 className="text-lg font-bold leading-tight">Clínica 4 Elements</h1>
+                                    <p className="text-xs text-teal-200">Sueroterapia & Medicina Regenerativa</p>
+                                </div>
+                            </div>
+                        </div>
+                    </header>
+
+                    <main className="max-w-5xl mx-auto px-4 py-6">
+                        <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+                            
+                            {/* FORMULARIO PACIENTE */}
+                            <div className="md:col-span-4 space-y-4">
+                                <div className="bg-white p-5 rounded-xl shadow-sm border border-slate-200 sticky top-24">
+                                    <div className="flex justify-between items-center mb-3">
+                                        <h2 className="text-md font-bold text-slate-700 flex items-center gap-2">
+                                            <Icon name="user" className="h-4 w-4 text-teal-600" /> Nuevo Paciente
+                                        </h2>
+                                        {/* Botón de Limpiar */}
+                                        <button 
+                                            onClick={resetForm} 
+                                            title="Limpiar Formulario"
+                                            className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded transition"
+                                        >
+                                            <Icon name="trash" className="h-4 w-4" />
+                                        </button>
+                                    </div>
+                                    <div className="space-y-3">
+                                        <input 
+                                            type="text" 
+                                            placeholder="Nombre completo"
+                                            className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 outline-none"
+                                            value={patient.name}
+                                            onChange={e => setPatient({...patient, name: e.target.value})}
+                                        />
+                                        <div className="flex gap-3">
+                                            <input 
+                                                type="number" 
+                                                placeholder="Edad"
+                                                className="w-1/3 p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 outline-none"
+                                                value={patient.age}
+                                                onChange={e => setPatient({...patient, age: e.target.value})}
+                                            />
+                                            <select 
+                                                className="w-2/3 p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 outline-none text-slate-600"
+                                                value={patient.sex}
+                                                onChange={e => setPatient({...patient, sex: e.target.value})}
+                                            >
+                                                <option value="">Sexo...</option>
+                                                <option value="Mujer">Mujer</option>
+                                                <option value="Hombre">Hombre</option>
+                                                <option value="Otro">Otro</option>
+                                            </select>
+                                        </div>
+
+                                        <div>
+                                            <textarea 
+                                                placeholder="Describe síntomas: fatiga, piel apagada, resfriado..."
+                                                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm h-32 focus:ring-2 focus:ring-teal-500 outline-none resize-none"
+                                                value={patient.symptoms}
+                                                onChange={e => setPatient({...patient, symptoms: e.target.value})}
+                                            />
+                                        </div>
+                                        <button 
+                                            onClick={analyzePatient}
+                                            className="w-full bg-teal-600 hover:bg-teal-700 text-white py-2.5 rounded-lg font-semibold text-sm shadow-sm flex justify-center items-center gap-2 transition"
+                                        >
+                                            <Icon name="search" className="h-4 w-4" /> Buscar Protocolo
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* RESULTADOS SUGERIDOS */}
+                            <div className="md:col-span-8">
+                                {suggestion ? (
+                                    <div className="bg-white rounded-xl shadow-lg border border-teal-100 overflow-hidden fade-in sticky top-24">
+                                        <div className="bg-teal-50 p-6 border-b border-teal-100">
+                                            <div className="flex justify-between items-start">
+                                                <div>
+                                                    <span className="inline-block px-2 py-1 bg-teal-100 text-teal-700 text-xs font-bold rounded uppercase tracking-wider mb-2">Recomendado</span>
+                                                    <h3 className="text-2xl font-bold text-teal-900">{suggestion.name}</h3>
+                                                    <p className="text-teal-700 mt-1">{suggestion.description}</p>
+                                                </div>
+                                                <div className="text-center bg-white px-3 py-2 rounded-lg shadow-sm border border-teal-100">
+                                                    <Icon name="activity" className="h-6 w-6 text-teal-600 mx-auto" />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Pestañas de Vista (Formulación vs Indicaciones) */}
+                                        <div className="px-6 pt-4 flex gap-4 border-b border-slate-100">
+                                            <button 
+                                                onClick={() => setShowClinicalInfo(false)}
+                                                className={`pb-2 text-sm font-bold transition ${!showClinicalInfo ? 'text-teal-600 border-b-2 border-teal-600' : 'text-slate-400 hover:text-slate-600'}`}
+                                            >
+                                                Protocolo
+                                            </button>
+                                            <button 
+                                                onClick={() => setShowClinicalInfo(true)}
+                                                className={`pb-2 text-sm font-bold transition ${showClinicalInfo ? 'text-teal-600 border-b-2 border-teal-600' : 'text-slate-400 hover:text-slate-600'}`}
+                                            >
+                                                Justificación Médica
+                                            </button>
+                                        </div>
+
+                                        <div className="p-6">
+                                            {!showClinicalInfo ? (
+                                                // VISTA DE PROTOCOLO
+                                                <div className="fade-in">
+                                                    <h4 className="font-bold text-slate-700 mb-4 flex items-center gap-2 text-sm uppercase tracking-wide">
+                                                        <Icon name="clipboard" className="h-4 w-4" /> Formulación del Suero
+                                                    </h4>
+                                                    
+                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                                                        {suggestion.ingredients.map((ing, i) => (
+                                                            <div key={i} className="flex justify-between items-center p-3 bg-slate-50 rounded-lg border border-slate-100">
+                                                                <span className="text-slate-700 font-medium text-sm">{ing.name}</span>
+                                                                <span className="text-slate-500 bg-white px-2 py-1 rounded shadow-sm text-xs font-mono font-bold">
+                                                                    {ing.qty} {ing.unit}
+                                                                </span>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+
+                                                    <div className="mt-6 flex items-center gap-4 text-sm text-slate-500 border-t border-slate-100 pt-4">
+                                                        <div className="flex items-center gap-2">
+                                                            <Icon name="activity" className="h-4 w-4 text-teal-500" /> 
+                                                            Duración: <span className="font-semibold text-slate-700">{suggestion.duration}</span>
+                                                        </div>
+                                                        <div className="flex-1"></div>
+                                                        <button 
+                                                            onClick={() => handleGenerateReport(suggestion)}
+                                                            className="px-6 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-lg font-semibold text-sm shadow transition flex items-center gap-2"
+                                                        >
+                                                            <Icon name="fileText" className="h-4 w-4" /> Generar Hoja de Tratamiento
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                // VISTA DE INDICACIONES CLÍNICAS (Solo pantalla)
+                                                <div className="fade-in">
+                                                    <div className="bg-amber-50 border border-amber-100 rounded-lg p-5 mb-4">
+                                                        <h4 className="text-amber-800 font-bold mb-2 flex items-center gap-2">
+                                                            <Icon name="bookOpen" className="h-5 w-5" /> Indicaciones Clínicas
+                                                        </h4>
+                                                        <p className="text-sm text-amber-900 leading-relaxed">
+                                                            {suggestion.clinicalNote || "No hay notas clínicas específicas para este protocolo."}
+                                                        </p>
+                                                    </div>
+                                                    <p className="text-xs text-slate-400 italic text-center">
+                                                        * Esta información es para uso interno médico y no aparecerá en el informe impreso del paciente.
+                                                    </p>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="h-full min-h-[400px] flex flex-col items-center justify-center bg-white rounded-xl border-2 border-dashed border-slate-200 text-slate-400 p-8 text-center">
+                                        <div className="bg-slate-50 p-4 rounded-full mb-4">
+                                            <Icon name="activity" className="h-8 w-8 text-slate-300" />
+                                        </div>
+                                        <h3 className="text-lg font-semibold text-slate-600">Esperando datos clínicos</h3>
+                                        <p className="text-sm max-w-xs mx-auto mt-2">
+                                            Introduce los síntomas del paciente para obtener recomendaciones.
+                                        </p>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </main>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<SueroterapiaApp />);
+    </script>
+</body>
+</html>
