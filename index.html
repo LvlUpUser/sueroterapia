@@ -3,15 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>4 Elements | Sistema Inteligente IV v10.3</title>
+    <title>4 Elements | Sistema IV v10.4</title>
     
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
     
     <script src="https://cdn.tailwindcss.com"></script>
 
@@ -25,22 +21,24 @@
                     },
                     colors: {
                         brand: {
-                            primary: '#418b89',   // Verde Profundo
-                            secondary: '#89b5b5', // Verde Suave
-                            accent: '#a68177',    // Arena Rosada
-                            warm: '#a68076',      // Arena Cálida
-                            dark: '#412814',      // Marrón Oscuro (Textos)
-                            bg: '#ece6dd',        // Beige Claro (Fondos)
+                            primary: '#418b89',
+                            secondary: '#89b5b5',
+                            accent: '#a68177',
+                            warm: '#a68076',
+                            dark: '#412814',
+                            bg: '#ece6dd',
                             white: '#ffffff',
                         }
                     },
                     animation: {
-                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'pulse-slow': 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
                     }
                 }
             }
         }
     </script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
 
     <style>
         body { background-color: #ece6dd; color: #412814; }
@@ -48,35 +46,26 @@
             body * { visibility: hidden; }
             #print-section, #print-section * { visibility: visible; }
             #print-section {
-                position: absolute;
-                left: 0; top: 0;
-                width: 100%;
-                margin: 0; padding: 0;
-                background: white;
+                position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 0; background: white;
             }
             .no-print { display: none !important; }
             @page { margin: 1cm; size: A4; }
             .break-inside-avoid { break-inside: avoid; }
         }
         .fade-in { animation: fadeIn 0.4s ease-in-out; }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        /* Toggle Switch Styles */
-        .toggle-checkbox:checked {
-            right: 0;
-            border-color: #418b89;
-        }
-        .toggle-checkbox:checked + .toggle-label {
-            background-color: #418b89;
-        }
+        /* Toggle Switch Mejorado */
+        .toggle-checkbox:checked { right: 0; border-color: #418b89; }
+        .toggle-checkbox:checked + .toggle-label { background-color: #418b89; }
         
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: #ece6dd; }
-        ::-webkit-scrollbar-thumb { background: #89b5b5; border-radius: 4px; }
+        /* Animación Micrófono */
+        .mic-active { animation: pulse-red 1.5s infinite; }
+        @keyframes pulse-red {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
     </style>
 </head>
 <body class="antialiased selection:bg-brand-secondary selection:text-white">
@@ -94,7 +83,6 @@
                 search: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>,
                 mic: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="23"/><line x1="8" x2="16" y1="23" y2="23"/></svg>,
                 alert: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>,
-                clock: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,
                 droplet: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12 22a7 7 0 0 0 7-7c0-2-5-9-5-9S9 13 9 15a7 7 0 0 0 3 7z"/></svg>,
                 user: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>,
                 shield: <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>,
@@ -114,7 +102,7 @@
             arginina: 1.50, taurina: 0.50, triptofano: 0.50, fungible: 5.00
         };
 
-        // --- LOS 7 PLANES DE LONGEVIDAD ---
+        // --- LOS 7 PLANES DE LONGEVIDAD (ORDENADOS) ---
         const LONGEVITY_PLANS_INFO = [
             { id: 1, name: "Plan 1 · Detox & Reinicio Metabólico", focus: "Eliminación de toxinas, reducción de inflamación y reseteo celular.", target: ["Hígado graso", "Excesos", "Fatiga", "Metales pesados"] },
             { id: 2, name: "Plan 2 · Glow & Antiaging", focus: "Luminosidad, hidratación profunda y estimulación de colágeno desde dentro.", target: ["Piel apagada", "Arrugas finas", "Manchas", "Falta de vitalidad"] },
@@ -125,7 +113,7 @@
             { id: 7, name: "Plan 7 · Rendimiento & Recuperación Deportiva", focus: "Optimización física, recuperación muscular y prevención de lesiones.", target: ["Deportistas", "Lesiones", "Preparación física", "Dolor muscular"] }
         ];
 
-        // --- DATABASE PROTOCOLOS ---
+        // --- DATABASE PROTOCOLOS (TODOS CON 3 SESIONES) ---
         const PROTOCOLS_DB = [
             {
                 id: 'equilibrio-vital',
@@ -133,51 +121,75 @@
                 element: 'Agua 💧',
                 subtext: 'Menopausia / Perimenopausia',
                 target: ['sofocos', 'insomnio', 'ansiedad', 'fatiga', 'menopausia'],
-                frequency: '7-10 días',
-                clinicalJustification: [
-                    { component: "Triptófano", reason: "Precursor de Serotonina. Regula el estado de ánimo." },
-                    { component: "Magnesio", reason: "Relajante muscular natural. Reduce el estrés adrenal." }
-                ],
                 sessions: [
                     {
                         name: 'S1: Neuroendocrina',
                         base: { name: "SF 0.9%", qty: 500, price: PRICES.suero500 },
                         duration: '60-75 min', speed: 'Lenta',
                         ingredients: [
-                            { name: "Triptófano 10 mg/ml", qty: 10, price: PRICES.triptofano, id: 'trip' },
+                            { name: "Triptófano", qty: 10, price: PRICES.triptofano, id: 'trip' },
                             { name: "Sulfato Magnesio", qty: 10, price: PRICES.magnesio },
                             { name: "Vitamina C", qty: 10, price: PRICES.vitC, id: 'vitc' },
                             { name: "Complejo B", qty: 5, price: PRICES.bComplex }
                         ]
                     },
                     {
-                        name: 'S2: Adaptación',
+                        name: 'S2: Adaptación & Calma',
                         base: { name: "SF 0.9%", qty: 500, price: PRICES.suero500 },
                         duration: '60 min', speed: 'Media',
                         ingredients: [
-                            { name: "Sulfato Magnesio", qty: 10, price: PRICES.magnesio },
+                            { name: "Sulfato Magnesio", qty: 15, price: PRICES.magnesio },
                             { name: "Vitamina C", qty: 10, price: PRICES.vitC, id: 'vitc' },
                             { name: "Oligoelementos (Zn/Se)", qty: 5, price: PRICES.oligo }
+                        ]
+                    },
+                    {
+                        name: 'S3: Consolidación Hormonal',
+                        base: { name: "SF 0.9%", qty: 500, price: PRICES.suero500 },
+                        duration: '60 min', speed: 'Media',
+                        ingredients: [
+                            { name: "Triptófano", qty: 5, price: PRICES.triptofano, id: 'trip' },
+                            { name: "Complejo B", qty: 10, price: PRICES.bComplex },
+                            { name: "Vitamina C", qty: 10, price: PRICES.vitC, id: 'vitc' }
                         ]
                     }
                 ]
             },
             {
                 id: 'origen-vida',
-                name: '3️⃣ Origen Vida',
+                name: '3️⃣ Origen Vida (Fertilidad)',
                 element: 'Tierra ⛰️',
-                subtext: 'Fertilidad',
+                subtext: 'Preparación y Calidad Ovocitaria',
                 target: ['fertilidad', 'embarazo', 'ovarios', 'reserva'],
-                frequency: '7-10 días',
                 sessions: [
                     {
-                        name: 'S1: Inicio NAD+',
+                        name: 'S1: Activación Mitocondrial (NAD+)',
                         base: { name: "SF 0.9%", qty: 500, price: PRICES.suero500 },
                         duration: '90 min', speed: 'Muy Lenta (NAD+)',
                         ingredients: [
                             { name: "NAD+", qty: 5, price: PRICES.nad, id: 'nad' },
                             { name: "L-Carnitina", qty: 10, price: PRICES.carnitina },
                             { name: "Vitamina C", qty: 5, price: PRICES.vitC, id: 'vitc' }
+                        ]
+                    },
+                    {
+                        name: 'S2: Nutrición Ovárica',
+                        base: { name: "SF 0.9%", qty: 500, price: PRICES.suero500 },
+                        duration: '60 min', speed: 'Lenta',
+                        ingredients: [
+                            { name: "Glutatión", qty: 10, price: PRICES.gluta },
+                            { name: "Inositol", qty: 10, price: PRICES.inositol },
+                            { name: "Zinc", qty: 5, price: PRICES.zinc }
+                        ]
+                    },
+                    {
+                        name: 'S3: Optimización Celular',
+                        base: { name: "SF 0.9%", qty: 500, price: PRICES.suero500 },
+                        duration: '90 min', speed: 'Muy Lenta',
+                        ingredients: [
+                            { name: "NAD+", qty: 5, price: PRICES.nad, id: 'nad' },
+                            { name: "Complejo B", qty: 5, price: PRICES.bComplex },
+                            { name: "Magnesio", qty: 5, price: PRICES.magnesio }
                         ]
                     }
                 ]
@@ -186,29 +198,47 @@
                 id: 'reinicio-metabolico',
                 name: '4️⃣ Reinicio Metabólico',
                 element: 'Fuego 🔥',
-                subtext: 'Control de Peso',
+                subtext: 'Control de Peso y Energía',
                 target: ['peso', 'metabolismo', 'grasa', 'adelgazar'],
-                frequency: '7 días',
                 sessions: [
                     {
-                        name: 'S1: Activación',
+                        name: 'S1: Quema & Activación',
                         base: { name: "SF 0.9%", qty: 500, price: PRICES.suero500 },
                         duration: '60 min', speed: 'Media',
                         ingredients: [
-                            { name: "L-Carnitina", qty: 10, price: PRICES.carnitina },
+                            { name: "L-Carnitina", qty: 15, price: PRICES.carnitina },
                             { name: "Inositol", qty: 10, price: PRICES.inositol },
                             { name: "Oligoelementos (Zn/Cr)", qty: 5, price: PRICES.oligo }
+                        ]
+                    },
+                    {
+                        name: 'S2: Detox Hepático',
+                        base: { name: "SF 0.9%", qty: 500, price: PRICES.suero500 },
+                        duration: '60 min', speed: 'Media',
+                        ingredients: [
+                            { name: "Glutatión", qty: 15, price: PRICES.gluta },
+                            { name: "Vitamina C", qty: 15, price: PRICES.vitC, id: 'vitc' },
+                            { name: "Complejo B", qty: 5, price: PRICES.bComplex }
+                        ]
+                    },
+                    {
+                        name: 'S3: Energía Sostenida',
+                        base: { name: "SF 0.9%", qty: 500, price: PRICES.suero500 },
+                        duration: '60 min', speed: 'Media',
+                        ingredients: [
+                            { name: "Taurina", qty: 10, price: PRICES.taurina },
+                            { name: "L-Carnitina", qty: 10, price: PRICES.carnitina },
+                            { name: "Magnesio", qty: 10, price: PRICES.magnesio }
                         ]
                     }
                 ]
             },
              {
                 id: 'mujer-calma',
-                name: '2️⃣ Mujer en Calma',
+                name: '2️⃣ Mujer en Calma (Endometriosis)',
                 element: 'Agua 💧',
-                subtext: 'Endometriosis / Dolor Pélvico',
+                subtext: 'Dolor Pélvico e Inflamación',
                 target: ['endometriosis', 'dolor', 'inflamación', 'pelvico'],
-                frequency: '10-14 días',
                 sessions: [
                      {
                         name: 'S1: Antiinflamatoria Profunda',
@@ -219,25 +249,64 @@
                             { name: "Vitamina C", qty: 20, price: PRICES.vitC, id: 'vitc' },
                             { name: "Procaína 1%", qty: 5, price: PRICES.procaina, id: 'procaina' }
                         ]
+                    },
+                    {
+                        name: 'S2: Reparación Tisular',
+                        base: { name: "SF 0.9%", qty: 500, price: PRICES.suero500 },
+                        duration: '60 min', speed: 'Media',
+                        ingredients: [
+                            { name: "Magnesio", qty: 15, price: PRICES.magnesio },
+                            { name: "Zinc", qty: 5, price: PRICES.zinc },
+                            { name: "Complejo B", qty: 10, price: PRICES.bComplex }
+                        ]
+                    },
+                    {
+                        name: 'S3: Mantenimiento Antiinflamatorio',
+                        base: { name: "SF 0.9%", qty: 500, price: PRICES.suero500 },
+                        duration: '60 min', speed: 'Lenta',
+                        ingredients: [
+                            { name: "Glutatión", qty: 10, price: PRICES.gluta },
+                            { name: "Vitamina C", qty: 10, price: PRICES.vitC, id: 'vitc' },
+                            { name: "Cúrcuma/Oligos", qty: 5, price: PRICES.oligo }
+                        ]
                     }
                 ]
             },
              {
                 id: 'reset-celular',
-                name: '8️⃣ Reset Celular',
+                name: '8️⃣ Reset Celular (Myers)',
                 element: 'Aire 🌬️',
-                subtext: 'Myers Clásico',
-                target: ['reset', 'estres', 'cansancio'],
-                frequency: '14 días',
+                subtext: 'Fatiga Crónica & Estrés',
+                target: ['reset', 'estres', 'cansancio', 'myers'],
                 sessions: [
                     {
-                        name: 'S1: Myers Completo',
+                        name: 'S1: Myers Clásico',
                         base: { name: "SF 0.9%", qty: 500, price: PRICES.suero500 },
                         duration: '60 min', speed: 'Media',
                         ingredients: [
                             { name: "Complejo B", qty: 10, price: PRICES.bComplex },
                             { name: "Vitamina C", qty: 15, price: PRICES.vitC, id: 'vitc' },
                             { name: "Sulfato Magnesio", qty: 10, price: PRICES.magnesio }
+                        ]
+                    },
+                    {
+                        name: 'S2: Refuerzo Adrenal',
+                        base: { name: "SF 0.9%", qty: 500, price: PRICES.suero500 },
+                        duration: '60 min', speed: 'Media',
+                        ingredients: [
+                            { name: "Vitamina C", qty: 20, price: PRICES.vitC, id: 'vitc' },
+                            { name: "Vitamina B5", qty: 10, price: PRICES.b5 },
+                            { name: "Magnesio", qty: 10, price: PRICES.magnesio }
+                        ]
+                    },
+                    {
+                        name: 'S3: Vitalidad Total',
+                        base: { name: "SF 0.9%", qty: 500, price: PRICES.suero500 },
+                        duration: '60 min', speed: 'Media',
+                        ingredients: [
+                            { name: "Complejo B", qty: 10, price: PRICES.bComplex },
+                            { name: "Taurina", qty: 5, price: PRICES.taurina },
+                            { name: "Oligoelementos", qty: 5, price: PRICES.oligo }
                         ]
                     }
                 ]
@@ -247,65 +316,75 @@
         // --- COMPONENTE PRINCIPAL ---
         function SueroterapiaApp() {
             const [patient, setPatient] = useState({ name: '', age: '', sex: '', symptoms: '' });
-            // --- FLAGS ESTADO ---
             const [flags, setFlags] = useState({
+                glp1: false,
                 bipolar: false,
                 antidepressants: false,
                 glaucoma: false,
                 hypotension: false,
                 migraine: false,
                 thyroid: false,
-                siboMethane: false,
-                glp1: false // NUEVO FLAG GLP-1
+                siboMethane: false
             });
             const [selectedProtocol, setSelectedProtocol] = useState(null);
             const [activeSession, setActiveSession] = useState(0);
             const [showReport, setShowReport] = useState(false);
-            const [isListening, setIsListening] = useState(false);
-            const [viewMode, setViewMode] = useState('formula');
-            const [showPlansModal, setShowPlansModal] = useState(false); // Modal Planes
-            const [printWithPrices, setPrintWithPrices] = useState(true); // Toggle Precios
+            const [showPlansModal, setShowPlansModal] = useState(false);
+            const [printWithPrices, setPrintWithPrices] = useState(true);
+            const [isListening, setIsListening] = useState(false); // Estado micrófono
 
             const textareaRef = useRef(null);
 
-            // --- Lógica Safety Update Completa ---
+            // --- Lógica Micrófono ---
+            const toggleMic = () => {
+                if (!('webkitSpeechRecognition' in window)) {
+                    alert("Tu navegador no soporta entrada de voz. Prueba con Chrome.");
+                    return;
+                }
+
+                if (isListening) {
+                    setIsListening(false);
+                } else {
+                    const recognition = new window.webkitSpeechRecognition();
+                    recognition.lang = 'es-ES';
+                    recognition.continuous = false;
+                    recognition.interimResults = false;
+
+                    recognition.onstart = () => setIsListening(true);
+                    recognition.onend = () => setIsListening(false);
+                    recognition.onresult = (event) => {
+                        const transcript = event.results[0][0].transcript;
+                        setPatient(prev => ({ ...prev, symptoms: prev.symptoms + (prev.symptoms ? ' ' : '') + transcript }));
+                    };
+                    recognition.onerror = (e) => {
+                        console.error(e);
+                        setIsListening(false);
+                        alert("Error en reconocimiento de voz.");
+                    };
+                    recognition.start();
+                }
+            };
+
+            // --- Lógica Safety Update ---
             const getSafeSession = (session) => {
                 if (!session) return null;
                 let safeIngredients = [...session.ingredients];
                 let warnings = [];
                 let modified = false;
 
-                // --- LOGICA GLP-1 (Actualizada según input usuario) ---
                 if (flags.glp1) {
-                    // Alerta General de Vaciamiento Gástrico
                     warnings.push("⚠️ GLP-1 ACTIVO: Riesgo náuseas/gastroparesia. Infusión Lenta.");
-
-                    // 1. Interacción Vitamina C (Glucómetros + Diuresis)
                     const hasVitC = safeIngredients.find(i => i.id === 'vitc' || i.name.includes("Vitamina C"));
-                    if (hasVitC && hasVitC.qty >= 5) {
-                         warnings.push("ALERTA GLP-1 + VIT C: Posible error glucómetro (falsa glucemia) y efecto diurético. HIDRATAR.");
-                    }
-
-                    // 2. Interacción NAD+ (Sensibilidad Insulina)
+                    if (hasVitC && hasVitC.qty >= 5) warnings.push("ALERTA GLP-1 + VIT C: Posible error glucómetro y efecto diurético. HIDRATAR.");
                     const hasNad = safeIngredients.find(i => i.id === 'nad');
-                    if (hasNad) {
-                        warnings.push("ALERTA GLP-1 + NAD+: Sinergia sensibilidad insulina. Riesgo Hipoglucemia. VIGILAR.");
-                    }
-
-                    // 3. Glutatión / NAC (Función Renal/Hepática - Precaución General)
-                    const hasGluta = safeIngredients.find(i => i.name.includes("Glutatión"));
-                    if (hasGluta) {
-                        // Nota leve, no warning bloqueante
-                        // warnings.push("Precaución: Vigilar función renal con Glutatión en pac. deshidratados.");
-                    }
+                    if (hasNad) warnings.push("ALERTA GLP-1 + NAD+: Riesgo Hipoglucemia. VIGILAR.");
                 }
 
-                // Reglas Previas
                 if (flags.bipolar || flags.antidepressants || flags.siboMethane) {
                     const hasTrip = safeIngredients.find(i => i.id === 'trip');
                     if (hasTrip) {
                         safeIngredients = safeIngredients.filter(i => i.id !== 'trip');
-                        warnings.push(`TRIPTÓFANO RETIRADO (${flags.bipolar ? 'Bipolaridad' : flags.antidepressants ? 'Antidepresivos' : 'SIBO Metano'}).`);
+                        warnings.push(`TRIPTÓFANO RETIRADO.`);
                         modified = true;
                     }
                 }
@@ -315,22 +394,22 @@
                     if (hasNad) {
                          if (flags.bipolar) {
                             safeIngredients = safeIngredients.filter(i => i.id !== 'nad');
-                            warnings.push("NAD+ RETIRADO (Contraindicado en Bipolaridad).");
+                            warnings.push("NAD+ RETIRADO (Contraindicado Bipolar).");
                             modified = true;
                          } else {
-                             warnings.push("ALERTA NAD+: Precaución por Glaucoma.");
+                             warnings.push("ALERTA NAD+: Precaución Glaucoma.");
                          }
                     }
                 }
 
                 if (flags.hypotension) {
                     const hasVasodilator = safeIngredients.find(i => i.id === 'arginina' || i.id === 'procaina');
-                    if (hasVasodilator) warnings.push("ALERTA HIPOTENSIÓN: Vigilar TA por vasodilatadores.");
+                    if (hasVasodilator) warnings.push("ALERTA HIPOTENSIÓN: Vigilar TA.");
                 }
                 
                 if (flags.migraine) {
-                     const hasVitC = safeIngredients.find(i => (i.id === 'vitc' || i.name.includes("Vitamina C")) && i.qty >= 15);
-                     if (hasVitC) warnings.push("ALERTA MIGRAÑA: Dosis alta Vitamina C. Infundir muy lento.");
+                     const hasVitC = safeIngredients.find(i => (i.id === 'vitc') && i.qty >= 15);
+                     if (hasVitC) warnings.push("ALERTA MIGRAÑA: Vit C alta dosis. Lento.");
                 }
 
                 return { ...session, ingredients: safeIngredients, warnings, modified };
@@ -350,11 +429,6 @@
                 return (ingredientsCost + session.base.price + PRICES.fungible);
             };
 
-            const calculateTotalTreatmentCost = (protocol) => {
-                if (!protocol) return 0;
-                return protocol.sessions.reduce((acc, s) => acc + calculateSessionCost(s), 0).toFixed(2);
-            };
-
             const searchProtocol = () => {
                 const text = patient.symptoms.toLowerCase();
                 const match = PROTOCOLS_DB.map(p => ({
@@ -366,7 +440,7 @@
 
             const resetPatient = () => {
                 setPatient({ name: '', age: '', sex: '', symptoms: '' });
-                setFlags({ bipolar: false, antidepressants: false, glaucoma: false, hypotension: false, migraine: false, thyroid: false, siboMethane: false, glp1: false });
+                setFlags({ glp1: false, bipolar: false, antidepressants: false, glaucoma: false, hypotension: false, migraine: false, thyroid: false, siboMethane: false });
                 setSelectedProtocol(null);
             };
 
@@ -374,10 +448,10 @@
             if (showReport && safeProtocol) {
                 return (
                     <div className="min-h-screen bg-brand-dark/10 p-8 flex justify-center overflow-auto font-sans">
-                        {/* Controles Flotantes Impresión */}
+                        {/* Controles Flotantes */}
                         <div className="fixed top-4 right-4 flex flex-col gap-2 no-print z-50 items-end">
                             <div className="bg-white p-2 rounded-lg shadow-md flex items-center gap-2 border border-brand-primary/20">
-                                <span className="text-xs font-bold text-brand-dark uppercase">¿Mostrar Precios?</span>
+                                <span className="text-xs font-bold text-brand-dark uppercase">¿Precios?</span>
                                 <div className="relative inline-block w-10 align-middle select-none">
                                     <input type="checkbox" id="togglePrices" className="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer border-gray-300 checked:right-0 checked:border-brand-primary transition-all duration-300"
                                         checked={printWithPrices} onChange={e => setPrintWithPrices(e.target.checked)}/>
@@ -394,12 +468,9 @@
                         </div>
 
                         <div id="print-section" className="bg-white w-[21cm] min-h-[29.7cm] p-12 shadow-2xl relative text-sm">
-                            {/* Cabecera */}
-                             <div className="flex justify-between border-b-2 border-brand-primary pb-4 mb-6">
+                            <div className="flex justify-between border-b-2 border-brand-primary pb-4 mb-6">
                                 <div className="flex gap-4 items-center">
-                                    <div className="bg-brand-primary text-white p-2 rounded-lg">
-                                        <Icon name="droplet" className="h-8 w-8"/>
-                                    </div>
+                                    <div className="bg-brand-primary text-white p-2 rounded-lg"><Icon name="droplet" className="h-8 w-8"/></div>
                                     <div>
                                         <h1 className="text-2xl font-serif font-bold text-brand-primary">4 ELEMENTS</h1>
                                         <p className="text-brand-accent font-bold tracking-widest text-[10px] uppercase">Wellness Medical Center</p>
@@ -410,22 +481,15 @@
                                     <p>Fecha: {new Date().toLocaleDateString()}</p>
                                 </div>
                             </div>
-
                             <div className="bg-brand-bg p-4 rounded-lg border border-brand-secondary/20 mb-8">
                                 <h3 className="text-xs font-bold text-brand-primary uppercase mb-2">Paciente</h3>
                                 <p className="text-xl font-serif font-bold text-brand-dark capitalize">{patient.name || "Paciente"}</p>
-                                <div className="flex flex-wrap gap-2 mt-2">
-                                    {Object.entries(flags).filter(([_,v]) => v).map(([k,_]) => (
-                                        <span key={k} className="text-[10px] uppercase font-bold text-red-600 bg-red-100 px-2 py-0.5 rounded border border-red-200">
-                                            {k === 'glp1' ? '⚠️ GLP-1 (Ozempic/Saxenda)' : k}
-                                        </span>
-                                    ))}
-                                </div>
+                                {flags.glp1 && <p className="text-xs font-bold text-red-600 mt-2">⚠️ Tratamiento GLP-1 Activo</p>}
                             </div>
-
                             <h2 className="text-3xl font-serif font-bold text-brand-primary mb-2">{safeProtocol.name}</h2>
                             <p className="text-brand-secondary font-medium mb-6 flex items-center gap-2">{safeProtocol.element} | {safeProtocol.subtext}</p>
-
+                            
+                            {/* Renderizar TODAS las 3 sesiones en impresión */}
                             {safeProtocol.sessions.map((session, index) => (
                                 <div key={index} className="break-inside-avoid mb-8 border border-brand-secondary/20 rounded-lg overflow-hidden">
                                     <div className="bg-brand-bg p-3 border-b border-brand-secondary/20 flex justify-between items-center">
@@ -444,7 +508,7 @@
                                             <tr className="bg-white text-brand-secondary border-b border-brand-bg">
                                                 <th className="px-4 py-2 text-left w-1/2">Componente</th>
                                                 <th className="px-4 py-2 text-right">Dosis</th>
-                                                {printWithPrices && <th className="px-4 py-2 text-right">Coste Int.</th>}
+                                                {printWithPrices && <th className="px-4 py-2 text-right">Coste</th>}
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-brand-bg">
@@ -462,7 +526,7 @@
                                             ))}
                                             {printWithPrices && (
                                                 <tr className="bg-brand-bg font-bold text-brand-primary">
-                                                    <td className="px-4 py-2" colSpan="2">Coste Sesión (Mat+Fun)</td>
+                                                    <td className="px-4 py-2" colSpan="2">Coste Sesión</td>
                                                     <td className="px-4 py-2 text-right">{calculateSessionCost(session).toFixed(2)} €</td>
                                                 </tr>
                                             )}
@@ -475,26 +539,27 @@
                 );
             }
 
-            // --- VISTA DASHBOARD ---
+            // --- VISTA PRINCIPAL ---
             return (
                 <div className="min-h-screen bg-brand-bg pb-12 font-sans text-brand-dark relative">
-                    {/* MODAL PLANES DE LONGEVIDAD */}
+                    {/* MODAL PLANES (1-7 Ordenados) */}
                     {showPlansModal && (
                         <div className="fixed inset-0 bg-brand-dark/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 fade-in">
-                            <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-                                <div className="sticky top-0 bg-brand-primary text-white p-6 flex justify-between items-center rounded-t-xl z-10">
+                            <div className="bg-white rounded-xl shadow-2xl max-w-5xl w-full max-h-[90vh] overflow-y-auto">
+                                <div className="sticky top-0 bg-brand-primary text-white p-6 flex justify-between items-center z-10">
                                     <div>
                                         <h2 className="font-serif font-bold text-2xl">Planes de Longevidad</h2>
-                                        <p className="text-xs opacity-80 uppercase tracking-widest">Guía de Referencia 4 Elements</p>
+                                        <p className="text-xs opacity-80 uppercase tracking-widest">Guía de Referencia 1-7</p>
                                     </div>
                                     <button onClick={() => setShowPlansModal(false)} className="hover:bg-white/20 p-2 rounded-full transition"><Icon name="close" className="h-6 w-6"/></button>
                                 </div>
                                 <div className="p-8 grid md:grid-cols-2 gap-6">
                                     {LONGEVITY_PLANS_INFO.map(plan => (
-                                        <div key={plan.id} className="bg-brand-bg/20 p-6 rounded-xl border border-brand-secondary/10 hover:border-brand-primary/30 transition">
-                                            <h3 className="font-bold text-brand-primary text-lg mb-2">{plan.name}</h3>
-                                            <p className="text-sm text-brand-dark/80 mb-3 italic">{plan.focus}</p>
-                                            <div className="flex flex-wrap gap-2">
+                                        <div key={plan.id} className="bg-brand-bg/20 p-6 rounded-xl border border-brand-secondary/10 hover:border-brand-primary/30 transition relative overflow-hidden">
+                                            <div className="absolute top-0 right-0 bg-brand-secondary/10 text-brand-secondary font-bold text-[100px] leading-none opacity-20 -mr-4 -mt-4 pointer-events-none">{plan.id}</div>
+                                            <h3 className="font-bold text-brand-primary text-lg mb-2 relative z-10">{plan.name}</h3>
+                                            <p className="text-sm text-brand-dark/80 mb-4 italic relative z-10">{plan.focus}</p>
+                                            <div className="flex flex-wrap gap-2 relative z-10">
                                                 {plan.target.map((t,i) => <span key={i} className="text-[10px] bg-white border border-brand-secondary/20 px-2 py-1 rounded uppercase text-brand-secondary font-bold">{t}</span>)}
                                             </div>
                                         </div>
@@ -511,17 +576,17 @@
                                 <Icon name="leaf" className="h-6 w-6 text-brand-secondary text-white"/>
                                 <div>
                                     <h1 className="font-serif font-bold text-lg leading-none tracking-tight">4 ELEMENTS</h1>
-                                    <p className="text-xs text-white/80 font-medium tracking-widest uppercase">Sistema Inteligente v10.3</p>
+                                    <p className="text-xs text-white/80 font-medium tracking-widest uppercase">Sistema Inteligente v10.4</p>
                                 </div>
                             </div>
                             <button onClick={() => setShowPlansModal(true)} className="bg-white/10 hover:bg-white/20 text-xs px-4 py-2 rounded-full font-bold uppercase tracking-wider flex items-center gap-2 transition">
-                                <Icon name="book" className="h-4 w-4"/> Ver Planes Longevidad
+                                <Icon name="book" className="h-4 w-4"/> Ver Planes (1-7)
                             </button>
                         </div>
                     </header>
 
                     <main className="max-w-7xl mx-auto p-4 grid lg:grid-cols-12 gap-6 mt-6">
-                        {/* PANEL IZQUIERDO */}
+                        {/* LEFT PANEL */}
                         <div className="lg:col-span-4 space-y-4">
                             {/* Paciente */}
                             <div className="bg-white p-6 rounded-xl shadow-sm border border-brand-primary/10">
@@ -540,42 +605,44 @@
                                 </div>
                             </div>
 
-                            {/* Safety Flags (UPDATED GLP-1) */}
+                            {/* Red Flags (CLICABLES) */}
                             <div className="bg-white p-6 rounded-xl shadow-sm border border-brand-primary/10">
                                 <h2 className="font-bold text-brand-primary flex gap-2 items-center mb-4 text-sm uppercase tracking-wide"><Icon name="shield" className="h-5 w-5 text-brand-accent"/> Safety Flags</h2>
                                 <div className="space-y-2">
                                     {[
-                                        {key: 'glp1', label: 'Tratamiento GLP-1 (Ozempic/Saxenda)'}, 
+                                        {key: 'glp1', label: 'Tratamiento GLP-1 (Ozempic)'}, 
                                         {key: 'bipolar', label: 'Bipolaridad'},
                                         {key: 'antidepressants', label: 'Antidepresivos / ISRS'},
                                         {key: 'glaucoma', label: 'Glaucoma'},
                                         {key: 'hypotension', label: 'Hipotensión'},
                                         {key: 'migraine', label: 'Migraña'},
-                                        {key: 'thyroid', label: 'Analítica Tiroidea Próx.'},
+                                        {key: 'thyroid', label: 'Analítica Tiroidea'},
                                         {key: 'siboMethane', label: 'SIBO Metano'}
                                     ].map(flag => (
-                                        <div key={flag.key} className={`flex items-center justify-between p-2 rounded transition ${flag.key === 'glp1' ? 'bg-red-50 border border-red-100' : 'hover:bg-brand-bg/30'}`}>
+                                        <label key={flag.key} className={`flex items-center justify-between p-3 rounded cursor-pointer transition select-none ${flag.key === 'glp1' ? 'bg-red-50 border border-red-100 hover:bg-red-100' : 'hover:bg-brand-bg/30'}`}>
                                             <span className={`text-sm font-medium ${flag.key === 'glp1' ? 'text-red-700 font-bold' : 'text-brand-dark/80'}`}>{flag.label}</span>
-                                            <div className="relative inline-block w-10 mr-2 align-middle select-none">
-                                                <input type="checkbox" className="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer border-brand-bg checked:right-0 checked:border-brand-primary transition-all duration-300"
-                                                    checked={flags[flag.key]} onChange={e => setFlags({...flags, [flag.key]: e.target.checked})}/>
-                                                <label className={`toggle-label block overflow-hidden h-5 rounded-full cursor-pointer transition-colors duration-300 ${flags[flag.key] ? 'bg-brand-primary' : 'bg-brand-secondary/40'}`}></label>
-                                            </div>
-                                        </div>
+                                            <input type="checkbox" className="w-5 h-5 text-brand-primary rounded border-gray-300 focus:ring-brand-primary cursor-pointer"
+                                                checked={flags[flag.key]} onChange={e => setFlags({...flags, [flag.key]: e.target.checked})}/>
+                                        </label>
                                     ))}
                                 </div>
                             </div>
 
-                            {/* Buscador */}
+                            {/* Buscador + Micrófono */}
                             <div className="bg-white p-6 rounded-xl shadow-sm border border-brand-primary/10">
-                                <textarea ref={textareaRef} placeholder="Síntomas..." className="w-full p-4 bg-brand-bg/30 border border-brand-secondary/20 rounded-lg h-24 text-sm outline-none resize-none focus:ring-1 focus:ring-brand-primary" value={patient.symptoms} onChange={e=>setPatient({...patient, symptoms:e.target.value})}></textarea>
+                                <div className="relative">
+                                    <textarea ref={textareaRef} placeholder="Describe los síntomas..." className="w-full p-4 pr-12 bg-brand-bg/30 border border-brand-secondary/20 rounded-lg h-24 text-sm outline-none resize-none focus:ring-1 focus:ring-brand-primary" value={patient.symptoms} onChange={e=>setPatient({...patient, symptoms:e.target.value})}></textarea>
+                                    <button onClick={toggleMic} className={`absolute top-2 right-2 p-2 rounded-full transition-all ${isListening ? 'bg-red-500 text-white mic-active' : 'text-brand-secondary hover:text-brand-primary bg-white/50'}`}>
+                                        <Icon name="mic" className="h-5 w-5"/>
+                                    </button>
+                                </div>
                                 <button onClick={searchProtocol} className="w-full mt-4 bg-brand-primary text-white py-3 rounded-lg font-bold shadow-lg shadow-brand-primary/20 hover:bg-brand-primary/90 transition flex justify-center items-center gap-2 text-sm tracking-wide">
                                     <Icon name="search" className="h-4 w-4"/> BUSCAR PROTOCOLO
                                 </button>
                             </div>
                         </div>
 
-                        {/* PANEL DERECHO */}
+                        {/* RIGHT PANEL */}
                         <div className="lg:col-span-8">
                             {safeProtocol ? (
                                 <div className="bg-white rounded-xl shadow-lg border border-brand-primary/10 overflow-hidden fade-in min-h-[600px] flex flex-col">
@@ -596,7 +663,7 @@
 
                                         {currentSession.modified && (
                                             <div className="bg-brand-accent/5 border-l-4 border-brand-accent p-4 mb-6 rounded-r">
-                                                <h3 className="text-sm font-bold text-brand-accent flex items-center gap-2"><Icon name="alert" className="h-4 w-4"/> Protocolo Modificado (Seguridad GLP-1/Otros)</h3>
+                                                <h3 className="text-sm font-bold text-brand-accent flex items-center gap-2"><Icon name="alert" className="h-4 w-4"/> Protocolo Modificado</h3>
                                                 <ul className="list-disc list-inside mt-1 text-sm text-brand-warm space-y-1">
                                                     {currentSession.warnings.map((w,i) => <li key={i}>{w}</li>)}
                                                 </ul>
@@ -628,9 +695,12 @@
                             ) : (
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     {PROTOCOLS_DB.map(p => (
-                                        <button key={p.id} onClick={() => setSelectedProtocol(p)} className="bg-white p-6 rounded-xl border border-brand-primary/5 hover:border-brand-primary hover:shadow-xl transition-all text-left">
-                                            <span className="text-lg font-serif font-bold text-brand-dark block mb-1">{p.name}</span>
+                                        <button key={p.id} onClick={() => setSelectedProtocol(p)} className="bg-white p-6 rounded-xl border border-brand-primary/5 hover:border-brand-primary hover:shadow-xl transition-all text-left group">
+                                            <span className="text-lg font-serif font-bold text-brand-dark block mb-1 group-hover:text-brand-primary">{p.name}</span>
                                             <span className="text-xs text-brand-accent font-medium uppercase tracking-wider">{p.subtext}</span>
+                                            <div className="mt-2 flex gap-1">
+                                                 <span className="text-[10px] bg-brand-bg px-2 py-1 rounded text-brand-dark/60 font-mono">3 Sesiones</span>
+                                            </div>
                                         </button>
                                     ))}
                                 </div>
